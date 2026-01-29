@@ -1,0 +1,115 @@
+<div class="chat-container">
+  <!-- Chat Header -->
+  <div class="chat-header">
+    <div class="header-content">
+      <h2 class="chat-title">SQL Assistant</h2>
+      <button 
+        mat-icon-button 
+        (click)="clearChat()" 
+        matTooltip="Clear chat"
+        class="clear-btn">
+        <mat-icon>clear_all</mat-icon>
+      </button>
+    </div>
+    <p class="chat-subtitle">Convert your natural language questions into SQL queries</p>
+  </div>
+
+  <!-- Messages Container -->
+  <div class="messages-container" #chatContainer>
+    <div class="messages-list">
+      <div 
+        *ngFor="let message of messages" 
+        class="message-wrapper"
+        [ngClass]="'message-' + message.type">
+        
+        <mat-card class="message-card" [ngClass]="message.type + '-message'">
+          <!-- Message Header -->
+          <div class="message-header">
+            <div class="message-avatar">
+              <mat-icon>{{ message.type === 'user' ? 'person' : message.type === 'error' ? 'error' : 'smart_toy' }}</mat-icon>
+            </div>
+            <div class="message-info">
+              <span class="message-sender">
+                {{ message.type === 'user' ? 'You' : message.type === 'error' ? 'Error' : 'SQL Assistant' }}
+              </span>
+              <span class="message-time">{{ message.timestamp | date:'short' }}</span>
+            </div>
+          </div>
+
+          <!-- Message Content -->
+          <div class="message-content">
+            <p class="message-text">{{ message.content }}</p>
+            
+            <!-- SQL Code Block -->
+            <div *ngIf="message.sql" class="sql-container">
+              <div class="sql-header">
+                <span class="sql-label">Generated SQL:</span>
+                <button 
+                  mat-icon-button 
+                  (click)="copyToClipboard(message.sql!)"
+                  matTooltip="Copy SQL"
+                  class="copy-btn">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </div>
+              <pre class="sql-code"><code>{{ message.sql }}</code></pre>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+
+      <!-- Loading Message -->
+      <div *ngIf="isLoading" class="message-wrapper message-assistant">
+        <mat-card class="message-card assistant-message loading-message">
+          <div class="message-header">
+            <div class="message-avatar">
+              <mat-icon>smart_toy</mat-icon>
+            </div>
+            <div class="message-info">
+              <span class="message-sender">SQL Assistant</span>
+              <span class="message-time">Processing...</span>
+            </div>
+          </div>
+          <div class="message-content">
+            <div class="loading-content">
+              <mat-spinner diameter="24"></mat-spinner>
+              <span>Generating SQL query...</span>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input Area -->
+  <div class="input-container">
+    <mat-card class="input-card">
+      <div class="input-wrapper">
+        <mat-form-field appearance="outline" class="message-input-field">
+          <mat-label>Ask me to convert text to SQL...</mat-label>
+          <textarea 
+            matInput
+            #messageInput
+            [(ngModel)]="currentMessage"
+            (keydown)="onKeyPress($event)"
+            [disabled]="isLoading"
+            placeholder="e.g., Show me all users who registered last month"
+            rows="2"
+            maxlength="1000">
+          </textarea>
+          <mat-hint align="end">{{currentMessage.length}}/1000</mat-hint>
+        </mat-form-field>
+        
+        <button 
+          mat-fab 
+          color="primary"
+          (click)="sendMessage()"
+          [disabled]="!currentMessage.trim() || isLoading"
+          class="send-button"
+          matTooltip="Send message (Enter)">
+          <mat-icon>{{ isLoading ? 'hourglass_empty' : 'send' }}</mat-icon>
+        </button>
+      </div>
+    </mat-card>
+  </div>
+</div>
