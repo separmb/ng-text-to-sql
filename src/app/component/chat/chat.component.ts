@@ -37,7 +37,7 @@ export interface ChatMessage {
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent implements AfterViewChecked {
+export class ChatComponent  {
   @ViewChild('chatContainer') chatContainer!: ElementRef;
   @ViewChild('messageInput') messageInput!: ElementRef;
 
@@ -53,13 +53,9 @@ export class ChatComponent implements AfterViewChecked {
     this.messages.push({
       id: this.generateId(),
       type: 'assistant',
-      content: 'Hello! I can help you convert natural language to SQL queries. What would you like to ask?',
+      content: 'Hello! I can convert your text to SQL, execute the query, and return the results. What would you like to ask?',
       timestamp: new Date()
     });
-  }
-
-  ngAfterViewChecked() {
-    this.scrollToBottom();
   }
 
   sendMessage(): void {
@@ -100,7 +96,7 @@ export class ChatComponent implements AfterViewChecked {
     const assistantMessage: ChatMessage = {
       id: this.generateId(),
       type: 'assistant',
-      content: response.explanation || 'Here is your SQL query:',
+      content: response.explanation || 'Here are your results:',
       sql: response.sql,
       timestamp: new Date()
     };
@@ -132,7 +128,7 @@ export class ChatComponent implements AfterViewChecked {
 
   copyToClipboard(text: string): void {
     navigator.clipboard.writeText(text).then(() => {
-      this.snackBar.open('SQL copied to clipboard!', 'Close', {
+      this.snackBar.open('Results copied to clipboard!', 'Close', {
         duration: 3000,
         panelClass: ['success-snackbar']
       });
@@ -148,19 +144,9 @@ export class ChatComponent implements AfterViewChecked {
     this.messages = [{
       id: this.generateId(),
       type: 'assistant',
-      content: 'Chat cleared. How can I help you with SQL today?',
+      content: 'Chat cleared. I can convert your text to SQL, execute the query, and return the results. What would you like to ask?',
       timestamp: new Date()
     }];
-  }
-
-  private scrollToBottom(): void {
-    try {
-      if (this.chatContainer) {
-        this.chatContainer.nativeElement.scrollTop = this.chatContainer.nativeElement.scrollHeight;
-      }
-    } catch (err) {
-      console.error('Error scrolling to bottom:', err);
-    }
   }
 
   private generateId(): string {

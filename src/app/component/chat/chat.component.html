@@ -2,7 +2,7 @@
   <!-- Chat Header -->
   <div class="chat-header">
     <div class="header-content">
-      <h2 class="chat-title">SQL Assistant</h2>
+      <h2 class="chat-title">Text2SQL Assistant</h2>
       <button 
         mat-icon-button 
         (click)="clearChat()" 
@@ -30,7 +30,7 @@
             </div>
             <div class="message-info">
               <span class="message-sender">
-                {{ message.type === 'user' ? 'You' : message.type === 'error' ? 'Error' : 'SQL Assistant' }}
+                {{ message.type === 'user' ? 'You' : message.type === 'error' ? 'Error' : 'Text2SQL Assistant' }}
               </span>
               <span class="message-time">{{ message.timestamp | date:'short' }}</span>
             </div>
@@ -66,7 +66,7 @@
               <mat-icon>smart_toy</mat-icon>
             </div>
             <div class="message-info">
-              <span class="message-sender">SQL Assistant</span>
+              <span class="message-sender">Text2SQL Assistant</span>
               <span class="message-time">Processing...</span>
             </div>
           </div>
