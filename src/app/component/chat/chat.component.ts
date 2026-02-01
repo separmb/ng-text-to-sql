@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewChecked, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -9,7 +9,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { LambdaService, ChatResponse } from '../../lambda.service';
 
 export interface ChatMessage {
   id: string;
@@ -37,16 +36,17 @@ export interface ChatMessage {
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent  {
+export class ChatComponent implements OnInit  {
   @ViewChild('chatContainer') chatContainer!: ElementRef;
   @ViewChild('messageInput') messageInput!: ElementRef;
 
   messages: ChatMessage[] = [];
   currentMessage = '';
   isLoading = false;
+  private readonly webSocketUrl = 'wss://as1ulfbcx3.execute-api.us-east-1.amazonaws.com/dev/'; 
+  private socket!: WebSocket;
 
   constructor(
-    private lambdaService: LambdaService,
     private snackBar: MatSnackBar
   ) {
     // Add welcome message
@@ -56,6 +56,19 @@ export class ChatComponent  {
       content: 'Hello! I can convert your text to SQL, execute the query, and return the results. What would you like to ask?',
       timestamp: new Date()
     });
+  }
+
+  ngOnInit(): void {
+    // deal with websocket setup
+    this.socket = new WebSocket(this.webSocketUrl);
+    this.socket.onopen = () => console.log('WebSocket connection established.');
+    this.socket.onmessage = (event) =>  {
+      this.handleSuccessResponse(event);
+    } ;
+    this.socket.onclose = () => console.log('WebSocket connection closed.');
+    this.socket.onerror = (error) => { 
+      this.handleErrorResponse(error);
+    }
   }
 
   sendMessage(): void {
@@ -71,44 +84,35 @@ export class ChatComponent  {
     };
 
     this.messages.push(userMessage);
-    const prompt = this.currentMessage.trim();
+    let prompt = this.currentMessage.trim();
     this.currentMessage = '';
     this.isLoading = true;
-
-    this.lambdaService.sendChatMessage(prompt).subscribe({
-      next: (response: ChatResponse) => {
-        this.handleSuccessResponse(response);
-        this.isLoading = false;
-      },
-      error: (error: Error) => {
-        this.handleErrorResponse(error.message);
-        this.isLoading = false;
-      }
-    });
+    
+    this.sendChatMessage(prompt);
   }
 
-  private handleSuccessResponse(response: ChatResponse): void {
-    if (response.error) {
-      this.handleErrorResponse(response.error);
-      return;
-    }
+  private handleSuccessResponse(response: MessageEvent): void {
+    console.log("Response is: " + response.data); 
+
+    let responseObj = JSON.parse(response.data);
 
     const assistantMessage: ChatMessage = {
       id: this.generateId(),
       type: 'assistant',
-      content: response.explanation || 'Here are your results:',
-      sql: response.sql,
+      content: 'Here are your results:',
+      sql: responseObj.sql,
       timestamp: new Date()
     };
 
     this.messages.push(assistantMessage);
+    this.isLoading = false;
   }
 
-  private handleErrorResponse(errorMessage: string): void {
+  private handleErrorResponse(error: Event): void {
     const errorMsg: ChatMessage = {
       id: this.generateId(),
       type: 'error',
-      content: `Sorry, I encountered an error: ${errorMessage}`,
+      content: `Sorry, I encountered an error: ${error}`,
       timestamp: new Date()
     };
 
@@ -117,7 +121,24 @@ export class ChatComponent  {
       duration: 5000,
       panelClass: ['error-snackbar']
     });
+    this.isLoading = false;
   }
+
+  sendChatMessage(prompt: string) {
+    let jsonMessage = {
+      prompt: prompt
+    }
+
+    if (this.socket.readyState === WebSocket.OPEN) {
+     this.socket.send(JSON.stringify(jsonMessage));
+    } else {
+      console.warn('WebSocket is not open.');
+    }
+  }
+
+  closeConnection(): void {
+    this.socket.close();
+  }  
 
   onKeyPress(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
