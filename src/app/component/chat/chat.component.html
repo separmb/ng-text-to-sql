@@ -41,18 +41,18 @@
             <p class="message-text">{{ message.content }}</p>
             
             <!-- SQL Code Block -->
-            <div *ngIf="message.sql" class="sql-container">
+            <div *ngIf="message.result" class="sql-container">
               <div class="sql-header">
                 <span class="sql-label">Generated SQL:</span>
                 <button 
                   mat-icon-button 
-                  (click)="copyToClipboard(message.sql!)"
-                  matTooltip="Copy SQL"
+                  (click)="copyToClipboard(message.result!)"
+                  matTooltip="Copy Results"
                   class="copy-btn">
                   <mat-icon>content_copy</mat-icon>
                 </button>
               </div>
-              <pre class="sql-code"><code>{{ message.sql }}</code></pre>
+              <pre class="sql-code"><code>{{ message.result }}</code></pre>
             </div>
           </div>
         </mat-card>

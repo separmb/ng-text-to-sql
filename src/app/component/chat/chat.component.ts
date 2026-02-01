@@ -14,7 +14,7 @@ export interface ChatMessage {
   id: string;
   type: 'user' | 'assistant' | 'error';
   content: string;
-  sql?: string;
+  result?: string;
   timestamp: Date;
 }
 
@@ -100,7 +100,7 @@ export class ChatComponent implements OnInit  {
       id: this.generateId(),
       type: 'assistant',
       content: 'Here are your results:',
-      sql: responseObj.sql,
+      result: responseObj.result,
       timestamp: new Date()
     };
 
