@@ -36,15 +36,17 @@ export interface ChatMessage {
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent implements OnInit  {
+export class ChatComponent {
   @ViewChild('chatContainer') chatContainer!: ElementRef;
   @ViewChild('messageInput') messageInput!: ElementRef;
 
   messages: ChatMessage[] = [];
   currentMessage = '';
   isLoading = false;
-  private readonly webSocketUrl = 'wss://as1ulfbcx3.execute-api.us-east-1.amazonaws.com/dev/'; 
+  private readonly webSocketUrl = 'wss://wei9prw2f2.execute-api.us-east-1.amazonaws.com/dev/'; 
   private socket!: WebSocket;
+  private reconnectAttempts = 0;
+  private maxReconnectAttempts = 10;
 
   constructor(
     private snackBar: MatSnackBar
@@ -56,18 +58,47 @@ export class ChatComponent implements OnInit  {
       content: 'Hello! I can convert your text to SQL, execute the query, and return the results. What would you like to ask?',
       timestamp: new Date()
     });
+    this.connect();
   }
 
-  ngOnInit(): void {
-    // deal with websocket setup
-    this.socket = new WebSocket(this.webSocketUrl);
-    this.socket.onopen = () => console.log('WebSocket connection established.');
-    this.socket.onmessage = (event) =>  {
-      this.handleSuccessResponse(event);
-    } ;
-    this.socket.onclose = () => console.log('WebSocket connection closed.');
-    this.socket.onerror = (error) => { 
-      this.handleErrorResponse(error);
+    /** Connect to WebSocket server */
+  private connect(): void {
+    try {
+      this.socket = new WebSocket(this.webSocketUrl);
+
+      this.socket.onopen = () => {
+        console.log('WebSocket connected');
+        this.reconnectAttempts = 0; // Reset attempts on success
+      };
+
+      this.socket.onmessage = (event) => {
+        this.handleSuccessResponse(event);
+      };
+
+      this.socket.onclose = () => {
+        console.warn('WebSocket closed. Attempting to reconnect...');
+        this.tryReconnect();
+      };
+
+      this.socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        this.handleErrorResponse(error);
+        this.socket.close(); // Force close to trigger reconnect
+      };
+    } catch (err) {
+      console.error('WebSocket connection error:', err);
+      this.tryReconnect();
+    }
+  }
+  /** Attempt to reconnect with exponential backoff */
+  private tryReconnect(): void {
+    if (this.reconnectAttempts < this.maxReconnectAttempts) {
+      const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000); // Max 30s
+      this.reconnectAttempts++;
+      console.log(`Reconnecting in ${delay / 1000}s...`);
+      setTimeout(() => this.connect(), delay);
+    } else {
+      console.error('Max reconnect attempts reached. Giving up.');
     }
   }
 
