@@ -127,16 +127,19 @@ export class ChatComponent {
 
     let responseObj = JSON.parse(response.data);
 
-    const assistantMessage: ChatMessage = {
-      id: this.generateId(),
-      type: 'assistant',
-      content: 'Here are your results:',
-      result: responseObj.result,
-      timestamp: new Date()
-    };
+    // ignore websocket timeouts
+    if (responseObj.message === undefined) {
+      const assistantMessage: ChatMessage = {
+        id: this.generateId(),
+        type: 'assistant',
+        content: 'Here are your results:',
+        result: responseObj.result,
+        timestamp: new Date()
+      };
 
-    this.messages.push(assistantMessage);
-    this.isLoading = false;
+      this.messages.push(assistantMessage);
+      this.isLoading = false;
+    } 
   }
 
   private handleErrorResponse(error: Event): void {
