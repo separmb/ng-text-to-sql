@@ -10,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
   template: `
     <mat-toolbar color="primary" class="app-header">
       <mat-icon class="header-icon">storage</mat-icon>
-      <span class="app-title">Text2SQL Assistant</span>
+      <span class="app-title">Text2SQL Application</span>
     </mat-toolbar>
     <main class="main-content">
       <router-outlet></router-outlet>

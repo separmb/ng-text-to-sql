@@ -2,7 +2,7 @@
   <!-- Chat Header -->
   <div class="chat-header">
     <div class="header-content">
-      <h2 class="chat-title">Text2SQL Assistant</h2>
+      <h2 class="chat-title">Text2SQL Application</h2>
       <button 
         mat-icon-button 
         (click)="clearChat()" 
@@ -30,7 +30,7 @@
             </div>
             <div class="message-info">
               <span class="message-sender">
-                {{ message.type === 'user' ? 'You' : message.type === 'error' ? 'Error' : 'Text2SQL Assistant' }}
+                {{ message.type === 'user' ? 'You' : message.type === 'error' ? 'Error' : 'Text2SQL Application' }}
               </span>
               <span class="message-time">{{ message.timestamp | date:'short' }}</span>
             </div>
@@ -43,7 +43,7 @@
             <!-- SQL Code Block -->
             <div *ngIf="message.result" class="sql-container">
               <div class="sql-header">
-                <span class="sql-label">Generated SQL:</span>
+                <span class="sql-label">Generated Results:</span>
                 <button 
                   mat-icon-button 
                   (click)="copyToClipboard(message.result!)"
@@ -66,14 +66,14 @@
               <mat-icon>smart_toy</mat-icon>
             </div>
             <div class="message-info">
-              <span class="message-sender">Text2SQL Assistant</span>
+              <span class="message-sender">Text2SQL Application</span>
               <span class="message-time">Processing...</span>
             </div>
           </div>
           <div class="message-content">
             <div class="loading-content">
               <mat-spinner diameter="24"></mat-spinner>
-              <span>Generating SQL query...</span>
+              <span>Generating SQL query and results...</span>
             </div>
           </div>
         </mat-card>
@@ -86,15 +86,15 @@
     <mat-card class="input-card">
       <div class="input-wrapper">
         <mat-form-field appearance="outline" class="message-input-field">
-          <mat-label>Ask me to convert text to SQL...</mat-label>
+          <mat-label>Ask me to convert text to SQL, execute the query, and return the results...</mat-label>
           <textarea 
             matInput
             #messageInput
             [(ngModel)]="currentMessage"
             (keydown)="onKeyPress($event)"
             [disabled]="isLoading"
-            placeholder="e.g., Show me all users who registered last month"
-            rows="2"
+            placeholder="e.g., Connect to the database banking_system using the secrets manager key DBSecretD58955BC-5ddAjPF0USpk and give me a list of users and their account numbers and balances?"
+            rows="3"
             maxlength="1000">
           </textarea>
           <mat-hint align="end">{{currentMessage.length}}/1000</mat-hint>
