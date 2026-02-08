@@ -132,7 +132,7 @@ export class ChatComponent {
       const assistantMessage: ChatMessage = {
         id: this.generateId(),
         type: 'assistant',
-        content: 'Here are your results:',
+        content: '',
         result: responseObj.result,
         timestamp: new Date()
       };

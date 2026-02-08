@@ -43,7 +43,7 @@
             <!-- SQL Code Block -->
             <div *ngIf="message.result" class="sql-container">
               <div class="sql-header">
-                <span class="sql-label">Generated Results:</span>
+                <span class="sql-label">Results from Agent:</span>
                 <button 
                   mat-icon-button 
                   (click)="copyToClipboard(message.result!)"
@@ -86,7 +86,6 @@
     <mat-card class="input-card">
       <div class="input-wrapper">
         <mat-form-field appearance="outline" class="message-input-field">
-          <mat-label>Ask me to convert text to SQL, execute the query, and return the results...</mat-label>
           <textarea 
             matInput
             #messageInput
