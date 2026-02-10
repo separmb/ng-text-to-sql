@@ -3,31 +3,28 @@
 html, body { 
   height: 100%; 
   margin: 0; 
-  padding: 0;
-  font-family: 'Roboto', sans-serif;
-  background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
-  color: #e0e0e0;
+  font-family: 'Roboto', sans-serif; 
 }
 
 // Custom snackbar styles
 .success-snackbar {
-  --mdc-snackbar-container-color: #00ff88 !important;
-  --mat-snack-bar-button-color: #0f0f1e !important;
-  --mdc-snackbar-supporting-text-color: #0f0f1e !important;
-}
-
-.error-snackbar {
-  --mdc-snackbar-container-color: #ff006e !important;
+  --mdc-snackbar-container-color: #4caf50 !important;
   --mat-snack-bar-button-color: #fff !important;
   --mdc-snackbar-supporting-text-color: #fff !important;
 }
 
-// Custom material dark theme
-$custom-primary: mat.define-palette(mat.$cyan-palette, 500, 300, 700);
-$custom-accent: mat.define-palette(mat.$deep-orange-palette, A200, A100, A400);
+.error-snackbar {
+  --mdc-snackbar-container-color: #f44336 !important;
+  --mat-snack-bar-button-color: #fff !important;
+  --mdc-snackbar-supporting-text-color: #fff !important;
+}
+
+// Custom material theme
+$custom-primary: mat.define-palette(mat.$blue-palette);
+$custom-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
 $custom-warn: mat.define-palette(mat.$red-palette);
 
-$custom-theme: mat.define-dark-theme((
+$custom-theme: mat.define-light-theme((
   color: (
     primary: $custom-primary,
     accent: $custom-accent,
@@ -36,25 +33,3 @@ $custom-theme: mat.define-dark-theme((
 ));
 
 @include mat.all-component-themes($custom-theme);
-
-// Dark mode overrides for Material components
-.mat-mdc-card {
-  background-color: #2a2a3e !important;
-  color: #e0e0e0 !important;
-}
-
-.mat-mdc-form-field-label {
-  color: #c0c0d0 !important;
-}
-
-.mat-mdc-text-field-wrapper {
-  background-color: #1a1a2e !important;
-}
-
-.mat-mdc-icon-button {
-  color: #00ff88 !important;
-}
-
-.mat-spinner circle {
-  stroke: #00ff88 !important;
-}
