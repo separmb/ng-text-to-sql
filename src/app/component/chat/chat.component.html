@@ -4,11 +4,11 @@
     <div class="header-content">
       <h2 class="chat-title">Text2SQL Application</h2>
       <button 
-        mat-icon-button 
+        mat-stroked-button
         (click)="clearChat()" 
-        matTooltip="Clear chat"
         class="clear-btn">
         <mat-icon>clear_all</mat-icon>
+        <span>Clear Chat</span>
       </button>
     </div>
     <p class="chat-subtitle">Convert your natural language questions into SQL queries</p>
@@ -47,7 +47,6 @@
                 <button 
                   mat-icon-button 
                   (click)="copyToClipboard(message.result!)"
-                  matTooltip="Copy Results"
                   class="copy-btn">
                   <mat-icon>content_copy</mat-icon>
                 </button>

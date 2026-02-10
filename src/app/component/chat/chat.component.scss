@@ -6,7 +6,7 @@
 }
 
 .chat-header {
-  background: white;
+  background: #1976d2;
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   border-radius: 0 0 16px 16px;
@@ -21,21 +21,30 @@
 
   .chat-title {
     margin: 0;
-    color: #1976d2;
+    color: white;
     font-weight: 600;
   }
 
   .chat-subtitle {
     margin: 0;
-    color: #666;
+    color: white;
     font-size: 0.9rem;
   }
 
   .clear-btn {
-    color: #666;
-    
-    &:hover {
-      color: #f44336;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-color: rgba(255, 255, 255, 0.5);
+
+    mat-icon {
+      margin: 0;
+    }
+
+    span {
+      font-size: 0.9rem;
+      font-weight: 500;
     }
   }
 }
