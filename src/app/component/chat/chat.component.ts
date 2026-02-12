@@ -9,6 +9,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { AwsWebsocketService, AWSCredentials, WebSocketSignedUrlConfig } from '../../generate-signed-url.service';
 
 export interface ChatMessage {
   id: string;
@@ -43,13 +44,14 @@ export class ChatComponent {
   messages: ChatMessage[] = [];
   currentMessage = '';
   isLoading = false;
-  private readonly webSocketUrl = 'wss://wei9prw2f2.execute-api.us-east-1.amazonaws.com/dev/'; 
+  //private readonly webSocketUrl = 'wss://wei9prw2f2.execute-api.us-east-1.amazonaws.com/dev?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAYSQVGRE2F5C4AK46%2F20260212%2Fus-east-1%2Fexecute-api%2Faws4_request&X-Amz-Date=20260212T141246Z&X-Amz-Expires=43200&X-Amz-SignedHeaders=host&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEA4aCXVzLWVhc3QtMSJHMEUCIQCZkNnRm%2FSJJnzFJvIrybbcxkwuADNH18ibl4dehMILxgIgRJNUNsDL6TZz4ySMRXJMzmQIt%2Fn%2BeKcrVC5nZFtrhLoqmgMI1%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw1ODk1Mjg3Mjk5MDgiDJVfNilbfwqjNDNLqiruAv2X8Ew1T5w1CX3BzAvC3DITPYl4%2BKBYbvZ4w6XRnSfrhnfNt0fF2UcAWS%2FMAKBzyXInIafprd0kuIghP%2FzIcrwkB5F9sstwINNEoiMPf3rkKRJPjidOnjtvVDte9tOsgTvQpmdrxwpRH7GJnw1HPqupdgvUOYhzaOVFzcpzw8H79IBDI0RGl47cjPrk%2B7D%2BaDyMVwZjsQICyp0WYe95cdojeVcP%2FHvqfjaNSbg3Fd%2BYX0ojdcBUk%2BcqleF1H%2F%2Bzj8oK%2BoY5viYR3QkjaQdd2lkADrXNUU%2FZVF6FSKo%2BZIux5BMei2Xr%2FXmjbs2n3VoJpnxSmSL1ya0PsApwEVXlor4OcVx6g2FxFiQLD9mFNXwRtisEgrvy3xRWUcuFQxoOv7LGHUG0%2B%2BFgbT%2BL648sJIGd1iOhcDWtYiG1i2dsi6UVF3yHcRI2tmnKn8lP2McmRm8NnKUEBS1xRgM7tK7FDaaUbapQEHdMf5Pw6OuxXTDCu7fMBjqkAUlt2BHg5TS67dZT19h2KehaRiNTJxXZrJ89%2Brj%2FiXjJLrJFaBlk6zhbQtbYKyJGi1JRUHZi1S0BPeGMJbe4U7LemjiXbO2SrOss4jgrbBF28J5TIIgMImK52JruD%2BMe0rSBGQTkyW6RBAsOxPej25iRPOUlBswDJAWZd7MA9PkExUisbKKiSHVuKjWsbMuEMF7RM8s3YitIxfciJul7a9LOn3Qq&X-Amz-Signature=d5af2d21daa479429dbd6d9a2b6535131ee14b1552dd63341cfdf06319d3d15c'; 
   private socket!: WebSocket;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 10;
 
   constructor(
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private signedUrlService: AwsWebsocketService
   ) {
     // Add welcome message
     this.messages.push({
@@ -64,7 +66,23 @@ export class ChatComponent {
     /** Connect to WebSocket server */
   private connect(): void {
     try {
-      this.socket = new WebSocket(this.webSocketUrl);
+      const credentials: AWSCredentials = {
+        accessKeyId: (window as any).appConfig.AWS_ACCESS_KEY_ID,     
+        secretAccessKey:(window as any).appConfig.AWS_SECRET_ACCESS_KEY,
+        sessionToken: (window as any).appConfig.AWS_SESSION_TOKEN
+      }
+
+      const urlConfig: WebSocketSignedUrlConfig = {
+        region: 'us-east-1',
+        stage: 'dev',
+        apiId: 'wei9prw2f2',
+        credentials,
+        expiresInSeconds: 43200 // 12 hours
+      }
+
+      const signedUrl = this.signedUrlService.generateSignedWebSocketUrl(urlConfig);
+      console.log(signedUrl)
+      this.socket = new WebSocket(signedUrl);
 
       this.socket.onopen = () => {
         console.log('WebSocket connected');
